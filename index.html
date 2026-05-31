@@ -3,69 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Khan Medicos Pro - Complete System</title>
+  <title>Khan Medicos Pro</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
-      --primary: #2563eb; --primary-dark: #1d4ed8; --bg: #f3f4f6; --card: #fff;
-      --text: #1f2937; --border: #e5e7eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
-      --sidebar-w: 240px;
+      --primary: #2563eb; --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+      --bg: #f3f4f6; --card: #fff; --text: #1f2937; --sidebar-w: 240px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
     body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
     
-    /* Layout */
-    .sidebar { width: var(--sidebar-w); background: #111827; color: #fff; padding: 20px 0; position: fixed; height: 100vh; overflow-y: auto; }
-    .sidebar h2 { text-align: center; margin-bottom: 30px; font-size: 1.4rem; border-bottom: 1px solid #374151; padding-bottom: 15px; }
-    .nav-item { padding: 12px 20px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
+    .sidebar { width: var(--sidebar-w); background: #111827; color: #fff; padding: 20px 0; position: fixed; height: 100vh; }
+    .sidebar h2 { text-align: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid #374151; }
+    .nav-item { padding: 12px 20px; cursor: pointer; transition: 0.2s; }
     .nav-item:hover, .nav-item.active { background: var(--primary); }
     .main { margin-left: var(--sidebar-w); flex: 1; padding: 20px; }
-    .page { display: none; animation: fadeIn 0.3s; }
+    .page { display: none; }
     .page.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Components */
+    
     .card { background: var(--card); padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
-    .stat-box { background: var(--card); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid var(--border); }
+    .stat-box { background: var(--card); padding: 15px; border-radius: 8px; text-align: center; }
     .stat-box h3 { font-size: 1.5rem; color: var(--primary); }
     
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
-    th { background: #f9fafb; font-weight: 600; }
-    .btn { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: 0.2s; margin: 2px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 10px; }
+    
+    .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; margin: 2px; }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-success { background: var(--success); color: #fff; }
     .btn-warning { background: var(--warning); color: #000; }
     .btn-danger { background: var(--danger); color: #fff; }
     .btn-info { background: #06b6d4; color: #fff; }
-    .btn:hover { opacity: 0.9; }
-    .btn-sm { padding: 5px 10px; font-size: 0.85rem; }
-
-    input, select, textarea { width: 100%; padding: 10px; margin: 8px 0 15px; border: 1px solid var(--border); border-radius: 6px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
     
-    /* Dropdown Search */    .search-wrapper { position: relative; }
-    .dropdown-list { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--border); border-radius: 0 0 6px 6px; max-height: 200px; overflow-y: auto; z-index: 10; display: none; }
-    .dropdown-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f3f4f6; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f9fafb; font-weight: 600; }
+    
+    /* Pagination */
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+    .pagination button { padding: 8px 14px; border: 1px solid var(--primary); background: #fff; color: var(--primary); border-radius: 6px; cursor: pointer; }
+    .pagination button:hover, .pagination button.active { background: var(--primary); color: #fff; }
+    .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .page-info { font-weight: 500; }
+        /* Search Dropdown */
+    .search-wrapper { position: relative; }
+    .dropdown-list { 
+      position: absolute; top: 100%; left: 0; right: 0; 
+      background: #fff; border: 1px solid #e5e7eb; 
+      border-radius: 0 0 6px 6px; 
+      max-height: 250px; overflow-y: auto; 
+      z-index: 100; display: none; 
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .dropdown-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; }
     .dropdown-item:hover { background: #eef2ff; }
-
-    /* Alerts & Modals */
-    .alert-box { background: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; }
-    .modal-content { background: #fff; padding: 25px; border-radius: 10px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+    .dropdown-item strong { display: block; color: var(--primary); }
+    .dropdown-item small { color: #6b7280; }
+    
+    .alert { padding: 12px; border-radius: 6px; margin-bottom: 15px; }
+    .alert-success { background: #d1fae5; color: #065f46; border: 1px solid var(--success); }
+    .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid var(--danger); }
+    
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: #fff; padding: 25px; border-radius: 10px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
     .close-btn { float: right; cursor: pointer; font-size: 1.5rem; }
-
-    .role-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
-    .role-admin { background: #dbeafe; color: #1e40af; }
-    .role-user { background: #fee2e2; color: #991b1b; }
-    .hidden { display: none; }
     
-    .file-input-wrapper { position: relative; overflow: hidden; display: inline-block; }
-    .file-input-wrapper input[type=file] { position: absolute; left: -9999px; }
-    
+    .hidden { display: none !important; }
     .action-btns { display: flex; gap: 5px; }
   </style>
 </head>
@@ -73,19 +78,10 @@
 
 <aside class="sidebar">
   <h2>💊 Khan Medicos</h2>
-  <div class="nav-item active" data-page="dashboard">📊 Dashboard</div>
-  <div class="nav-item" data-page="billing">🧾 Billing</div>
-  <div class="nav-item" data-page="inventory">📦 Inventory</div>
-  <div class="nav-item" data-page="expenses">💸 Expenses</div>
-  <div class="nav-item" data-page="alerts">⚠️ Low Stock Alerts</div>
-  <div class="nav-item" data-page="admin">🔐 Admin Panel</div>
-  <div style="padding: 20px; margin-top: auto; border-top: 1px solid #374151;">
-    <label style="font-size: 0.8rem; color: #9ca3af;">Switch Role (Demo):</label>
-    <select id="roleSwitcher">
-      <option value="admin">Admin</option>
-      <option value="user">User / Counter Staff</option>
-    </select>
-  </div>
+  <div class="nav-item active" onclick="showPage('dashboard')">📊 Dashboard</div>
+  <div class="nav-item" onclick="showPage('inventory')">💊 Inventory</div>
+  <div class="nav-item" onclick="showPage('billing')">🧾 Billing</div>
+  <div class="nav-item" onclick="showPage('alerts')">⚠️ Alerts</div>
 </aside>
 
 <main class="main">
@@ -95,11 +91,48 @@
     <div class="stats">
       <div class="stat-box"><h3 id="stat-meds">0</h3><p>Total Medicines</p></div>
       <div class="stat-box"><h3 id="stat-stock">PKR 0</h3><p>Stock Value</p></div>
-      <div class="stat-box"><h3 id="stat-sales">PKR 0</h3><p>Today's Sales</p></div>
-      <div class="stat-box"><h3 id="stat-exp">PKR 0</h3><p>Total Expenses</p></div>    </div>
-    <div class="card"><h3>⚡ Quick Actions</h3>
-      <button class="btn btn-primary" onclick="showPage('billing')">+ New Bill</button>
-      <button class="btn btn-success" onclick="showPage('inventory')">+ Add Medicine</button>
+      <div class="stat-box"><h3 id="stat-out">0</h3><p>Out of Stock</p></div>
+      <div class="stat-box"><h3 id="stat-sale">PKR 0</h3><p>Today's Sale</p></div>
+    </div>
+  </div>
+
+  <!-- INVENTORY -->  <div id="inventory" class="page">
+    <h2>📦 Medicine Inventory</h2>
+    
+    <div class="card">
+      <h3>Add / Edit Medicine</h3>
+      <div id="importAlert"></div>
+      <input type="hidden" id="editId">
+      <div class="form-row">
+        <input type="text" id="medName" placeholder="Medicine Name">
+        <input type="text" id="medCat" placeholder="Category">
+      </div>
+      <div class="form-row">
+        <input type="number" id="medStock" placeholder="Stock Qty">
+        <input type="number" id="medPrice" placeholder="Selling Price (PKR)">
+      </div>
+      <div class="form-row">
+        <input type="number" id="medWholesale" placeholder="Wholesale Rate (PKR)">
+        <input type="date" id="medExpiry">
+      </div>
+      <button class="btn btn-success" onclick="saveMedicine()">💾 Save Medicine</button>
+      <button class="btn btn-info" onclick="document.getElementById('excelInput').click()">📥 Import Excel</button>
+      <input type="file" id="excelInput" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
+      <button class="btn btn-primary" onclick="exportCSV()">📄 Export CSV</button>
+      <button class="btn btn-warning hidden" id="cancelBtn" onclick="cancelEdit()">❌ Cancel</button>
+    </div>
+
+    <div class="card">
+      <h3>Medicine List</h3>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Category</th><th>Stock</th><th>Wholesale</th><th>Price</th><th>Expiry</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="medTable"></tbody>
+      </table>
+      
+      <!-- Pagination -->
+      <div class="pagination" id="pagination"></div>
     </div>
   </div>
 
@@ -108,453 +141,459 @@
     <h2>🧾 Generate Bill</h2>
     <div class="card">
       <div class="form-row">
-        <div>
-          <label>Customer Phone # (Search First)</label>
-          <input type="tel" id="custPhone" placeholder="0300-XXXXXXX">
-        </div>
-        <div>
-          <label>Customer Name</label>
-          <input type="text" id="custName" placeholder="Auto-filled or New" readonly>
-          <div id="custHistory" class="hidden" style="margin-top:5px; font-size:0.85rem; color:#666;">Last Visit: <span id="custLast"></span></div>
-        </div>
+        <input type="tel" id="custPhone" placeholder="Customer Phone">
+        <input type="text" id="custName" placeholder="Customer Name">
       </div>
-      <div class="search-wrapper">
-        <label>Search Medicine</label>
-        <input type="text" id="medSearch" placeholder="Type medicine name...">
-        <div id="medDropdown" class="dropdown-list"></div>
-      </div>
-      <button class="btn btn-primary" onclick="addToCart()">Add to Cart</button>
       
-      <table id="cartTable">
+      <div class="search-wrapper">        <input type="text" id="medSearch" placeholder="Search Medicine (Type to search...)">
+        <div id="searchDropdown" class="dropdown-list"></div>
+      </div>
+      
+      <table style="margin-top: 20px;">
         <thead><tr><th>Medicine</th><th>Qty</th><th>Price</th><th>Total</th><th>Action</th></tr></thead>
-        <tbody id="cartBody"></tbody>
+        <tbody id="cartTable"></tbody>
       </table>
-      <div style="text-align:right; margin-top:15px;">
-        <p>Subtotal: <span id="cartSub">PKR 0</span></p>
-        <p>GST (5%): <span id="cartGST">PKR 0</span></p>
-        <h3>Total: <span id="cartTotal">PKR 0</span></h3>
+      
+      <div style="text-align: right; margin-top: 20px;">
+        <p>Subtotal: <strong>PKR <span id="subTotal">0</span></strong></p>
+        <p>GST (5%): <strong>PKR <span id="gst">0</span></strong></p>
+        <h3>Total: PKR <span id="grandTotal">0</span></h3>
       </div>
-      <button class="btn btn-success" onclick="generateBill()">💾 Generate Bill</button>
-    </div>
-  </div>
-
-  <!-- INVENTORY -->
-  <div id="inventory" class="page">
-    <h2>📦 Medicine Inventory</h2>
-    <div class="card">
-      <h3>Add / Edit Medicine</h3>
-      <input type="hidden" id="editMedId">
-      <div class="form-row">
-        <input type="text" id="invName" placeholder="Medicine Name">        <input type="text" id="invCat" placeholder="Category">
-      </div>
-      <div class="form-row">
-        <input type="number" id="invStock" placeholder="Stock Qty">
-        <input type="number" id="invPrice" placeholder="Selling Price (PKR)">
-      </div>
-      <div class="form-row admin-only">
-        <input type="number" id="invWholesale" placeholder="Wholesale Rate (PKR) [Admin Only]">
-        <input type="date" id="invExpiry" placeholder="Expiry Date">
-      </div>
-      <button class="btn btn-success" id="saveMedBtn" onclick="saveMedicine()">💾 Save Medicine</button>
-      <button class="btn btn-danger hidden" id="cancelEditBtn" onclick="cancelEdit()">❌ Cancel</button>
-      <button class="btn btn-info" onclick="document.getElementById('excelFile').click()">📥 Import Excel</button>
-      <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none" onchange="importExcel(this)">
-      <button class="btn btn-primary" onclick="exportInventory()">📄 Export CSV</button>
-    </div>
-    <div class="card">
-      <h3>Medicine List</h3>
-      <table>
-        <thead><tr><th>Name</th><th>Category</th><th>Stock</th><th class="admin-only">Wholesale</th><th>Price</th><th>Expiry</th><th>Action</th></tr></thead>
-        <tbody id="invTable"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- EXPENSES -->
-  <div id="expenses" class="page">
-    <h2>💸 Expense Tracker</h2>
-    <div class="card">
-      <div class="form-row">
-        <input type="text" id="expTitle" placeholder="Expense Title (e.g. Daraz Setup, Chai, Wholesale)">
-        <input type="number" id="expAmount" placeholder="Amount (PKR)">
-      </div>
-      <input type="date" id="expDate">
-      <textarea id="expNote" placeholder="Notes / Details"></textarea>
-      <button class="btn btn-warning" onclick="addExpense()">➕ Add Expense</button>
-    </div>
-    <div class="card">
-      <h3>Total Expense: <span id="totalExp">PKR 0</span></h3>
-      <table>
-        <thead><tr><th>Date</th><th>Title</th><th>Amount</th><th>Notes</th><th>Action</th></tr></thead>
-        <tbody id="expTable"></tbody>
-      </table>
+      
+      <button class="btn btn-success" onclick="generateBill()">Generate Bill</button>
     </div>
   </div>
 
   <!-- ALERTS -->
   <div id="alerts" class="page">
-    <h2>⚠️ Low Stock & Export</h2>
-    <div class="alert-box">      <h3>🔔 Medicines with Stock < 10</h3>
-      <p>These items need immediate reorder from wholesaler.</p>
-    </div>
-    <button class="btn btn-primary" onclick="exportLowStock()">📥 Export Low Stock to Excel</button>
-    <div class="card" style="margin-top:15px;">
-      <table>
-        <thead><tr><th>Name</th><th>Current Stock</th><th>Price</th><th>Category</th></tr></thead>
-        <tbody id="alertTable"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ADMIN -->
-  <div id="admin" class="page">
-    <h2>🔐 Admin Panel</h2>
-    <div class="card">
-      <h3>Add New Admin / User</h3>
-      <input type="text" id="adminUser" placeholder="Username">
-      <input type="password" id="adminPass" placeholder="Password">
-      <select id="adminRole"><option value="admin">Admin</option><option value="user">User</option></select>
-      <button class="btn btn-primary" onclick="addAdmin()">✅ Add User</button>
-    </div>
-    <div class="card">
-      <h3>Registered Users</h3>
-      <table><thead><tr><th>Username</th><th>Role</th><th>Action</th></tr></thead><tbody id="adminTable"></tbody></table>
-    </div>
+    <h2>⚠️ Low Stock Alerts</h2>
+    <div class="card" id="alertList"></div>
   </div>
 </main>
 
 <!-- BILL MODAL -->
 <div id="billModal" class="modal">
-  <div class="modal-content" id="billContent">
-    <span class="close-btn" onclick="closeModal('billModal')">&times;</span>
-    <h2 style="text-align:center;">💊 Khan Medicos</h2>
-    <p style="text-align:center;">Professional Pharmacy</p>
-    <hr style="margin:10px 0;">
-    <p><strong>Customer:</strong> <span id="billCust"></span> | <span id="billPhone"></span></p>
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h2 style="text-align: center;">💊 Khan Medicos</h2>
+    <p style="text-align: center;">Professional Pharmacy</p>
+    <hr style="margin: 10px 0;">
+    <p><strong>Customer:</strong> <span id="billCust"></span></p>
+    <p><strong>Phone:</strong> <span id="billPhone"></span></p>
     <p><strong>Date:</strong> <span id="billDate"></span></p>
-    <table id="billTable" style="margin:10px 0;">
+    <table style="margin: 15px 0;">
       <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
-      <tbody id="billBody"></tbody>
+      <tbody id="billItems"></tbody>
     </table>
     <hr>
-    <p style="text-align:right;"><strong>Total:</strong> <span id="billTotal"></span></p>
-    <p style="text-align:center; margin-top:20px; font-size:0.8rem; color:#666;">Aapki sehat hamari zimmedari hai.<br>Contact: 0300-1234567</p>
-    <div style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
-      <button class="btn btn-primary" onclick="downloadPDF()">🖨️ Print / PDF</button>
-      <button class="btn btn-success" onclick="sendWhatsApp()">📱 Send via WhatsApp</button>
+    <h3 style="text-align: right;">Total: PKR <span id="billTotal"></span></h3>
+    <p style="text-align: center; margin-top: 20px; color: #666;">Aapki sehat hamari zimmedari hai</p>
+    <div style="text-align: center; margin-top: 15px;">
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+      <button class="btn btn-success" onclick="closeModal()">Close</button>
     </div>
-  </div></div>
-
+  </div>
+</div>
 <script>
-  // === DATA & STATE ===
-  let medicines = JSON.parse(localStorage.getItem('km_meds')) || [
-    {id:1, name:'Panadol', cat:'Pain Relief', stock:20, price:50, wholesale:35, expiry:''},
-    {id:2, name:'Augmentin', cat:'Antibiotic', stock:5, price:120, wholesale:85, expiry:''}
-  ];
-  let customers = JSON.parse(localStorage.getItem('km_custs')) || [];
-  let expenses = JSON.parse(localStorage.getItem('km_exp')) || [];
-  let admins = JSON.parse(localStorage.getItem('km_admins')) || [{user:'admin', pass:'1234', role:'admin'}];
-  let cart = [];
-  let currentRole = localStorage.getItem('km_role') || 'admin';
-  let editingId = null;
+// Data
+let medicines = JSON.parse(localStorage.getItem('meds')) || [];
+let cart = [];
+let sales = JSON.parse(localStorage.getItem('sales')) || [];
+let currentPage = 1;
+const itemsPerPage = 20;
 
-  // === INIT ===
-  document.addEventListener('DOMContentLoaded', () => {
-    renderAll();
-    setupNav();
-    setupSearch();
-    document.getElementById('roleSwitcher').value = currentRole;
-    toggleAdminUI();
-  });
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  renderMedicines();
+  updateDashboard();
+  setupSearchDropdown();
+});
 
-  // === NAVIGATION & ROLE ===
-  function showPage(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.querySelector(`.nav-item[data-page="${id}"]`).classList.add('active');
-  }
-  function setupNav() {
-    document.querySelectorAll('.nav-item').forEach(n => {
-      n.addEventListener('click', () => showPage(n.dataset.page));
-    });
-  }
-  document.getElementById('roleSwitcher').addEventListener('change', e => {
-    currentRole = e.target.value;
-    localStorage.setItem('km_role', currentRole);
-    toggleAdminUI();
-    renderAll();
-  });
-  function toggleAdminUI() {
-    document.querySelectorAll('.admin-only').forEach(el => {
-      el.classList.toggle('hidden', currentRole !== 'admin');
-    });
-  }
+// Navigation
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  event.target.classList.add('active');
+  if(page === 'inventory') renderMedicines();
+  if(page === 'alerts') renderAlerts();
+}
 
-  // === RENDER FUNCTIONS ===
-  function renderAll() {    renderInventory();
-    renderExpenses();
-    renderAlerts();
-    renderAdmins();
+// Dashboard
+function updateDashboard() {
+  document.getElementById('stat-meds').textContent = medicines.length;
+  const stockVal = medicines.reduce((sum, m) => sum + (m.stock * m.price), 0);
+  document.getElementById('stat-stock').textContent = 'PKR ' + stockVal.toLocaleString();
+  const outStock = medicines.filter(m => m.stock === 0).length;
+  document.getElementById('stat-out').textContent = outStock;
+  const todaySale = sales.filter(s => s.date === new Date().toLocaleDateString()).reduce((sum, s) => sum + s.total, 0);
+  document.getElementById('stat-sale').textContent = 'PKR ' + todaySale.toLocaleString();
+}
+
+// Save Medicine
+function saveMedicine() {
+  const id = document.getElementById('editId').value;
+  const med = {
+    id: id ? parseInt(id) : Date.now(),
+    name: document.getElementById('medName').value,
+    category: document.getElementById('medCat').value,
+    stock: parseInt(document.getElementById('medStock').value) || 0,
+    price: parseFloat(document.getElementById('medPrice').value) || 0,
+    wholesale: parseFloat(document.getElementById('medWholesale').value) || 0,
+    expiry: document.getElementById('medExpiry').value
+  };
+  
+  if(!med.name || !med.price) {    alert('Name and Price are required!');
+    return;
+  }
+  
+  if(id) {
+    const idx = medicines.findIndex(m => m.id == id);
+    if(idx !== -1) medicines[idx] = med;
+  } else {
+    medicines.push(med);
+  }
+  
+  localStorage.setItem('meds', JSON.stringify(medicines));
+  clearForm();
+  renderMedicines();
+  updateDashboard();
+}
+
+// Edit Medicine
+function editMedicine(id) {
+  const med = medicines.find(m => m.id === id);
+  if(!med) return;
+  
+  document.getElementById('editId').value = med.id;
+  document.getElementById('medName').value = med.name;
+  document.getElementById('medCat').value = med.category;
+  document.getElementById('medStock').value = med.stock;
+  document.getElementById('medPrice').value = med.price;
+  document.getElementById('medWholesale').value = med.wholesale;
+  document.getElementById('medExpiry').value = med.expiry;
+  document.getElementById('cancelBtn').classList.remove('hidden');
+  window.scrollTo(0, 0);
+}
+
+// Delete Medicine
+function deleteMedicine(id) {
+  if(confirm('Delete this medicine?')) {
+    medicines = medicines.filter(m => m.id !== id);
+    localStorage.setItem('meds', JSON.stringify(medicines));
+    renderMedicines();
     updateDashboard();
   }
-  function updateDashboard() {
-    document.getElementById('stat-meds').textContent = medicines.length;
-    let stockVal = medicines.reduce((s,m) => s + (m.stock * m.price), 0);
-    document.getElementById('stat-stock').textContent = `PKR ${stockVal}`;
-    document.getElementById('stat-exp').textContent = `PKR ${expenses.reduce((s,e)=>s+e.amount,0)}`;
-  }
+}
 
-  // === INVENTORY - ADD/EDIT/DELETE/IMPORT/EXPORT ===
-  function saveMedicine() {
-    let med = {
-      id: editingId || Date.now(),
-      name: document.getElementById('invName').value,
-      cat: document.getElementById('invCat').value,
-      stock: parseInt(document.getElementById('invStock').value) || 0,
-      price: parseFloat(document.getElementById('invPrice').value) || 0,
-      wholesale: parseFloat(document.getElementById('invWholesale').value) || 0,
-      expiry: document.getElementById('invExpiry').value
-    };
-    if(!med.name || !med.price) return alert('Name & Price required');
-    
-    if(editingId) {
-      let idx = medicines.findIndex(m => m.id === editingId);
-      if(idx !== -1) medicines[idx] = med;
-    } else {
-      medicines.push(med);
-    }
-    saveData(); renderAll(); clearInvForm();
-  }
-  function editMedicine(id) {
-    let med = medicines.find(m => m.id === id);
-    if(!med) return;
-    editingId = id;
-    document.getElementById('invName').value = med.name;
-    document.getElementById('invCat').value = med.cat;
-    document.getElementById('invStock').value = med.stock;
-    document.getElementById('invPrice').value = med.price;
-    document.getElementById('invWholesale').value = med.wholesale || '';
-    document.getElementById('invExpiry').value = med.expiry || '';
-    document.getElementById('saveMedBtn').textContent = '💾 Update Medicine';
-    document.getElementById('cancelEditBtn').classList.remove('hidden');
-    window.scrollTo(0,0);
-  }
-  function cancelEdit() {
-    editingId = null;    clearInvForm();
-    document.getElementById('saveMedBtn').textContent = '💾 Save Medicine';
-    document.getElementById('cancelEditBtn').classList.add('hidden');
-  }
-  function clearInvForm() { 
-    ['invName','invCat','invStock','invPrice','invWholesale','invExpiry'].forEach(id=>document.getElementById(id).value=''); 
-  }
-  function deleteMedicine(id) { 
-    if(confirm('Delete this medicine?')) {
-      medicines = medicines.filter(m=>m.id!==id); 
-      saveData(); renderAll(); 
-    }
-  }
-  function renderInventory() {
-    let html = '';
-    medicines.forEach(m => {
-      let wCell = currentRole === 'admin' ? `<td>PKR ${m.wholesale}</td>` : '';
-      html += `<tr><td>${m.name}</td><td>${m.cat}</td><td>${m.stock}</td>${wCell}<td>PKR ${m.price}</td><td>${m.expiry || '-'}</td><td class="action-btns">
-        <button class="btn btn-sm btn-info" onclick="editMedicine(${m.id})">✏️</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteMedicine(${m.id})">🗑️</button>
-      </td></tr>`;
-    });
-    document.getElementById('invTable').innerHTML = html;
-  }
+// Cancel Edit
+function cancelEdit() {
+  clearForm();
+  document.getElementById('cancelBtn').classList.add('hidden');
+}
+
+// Clear Formfunction clearForm() {
+  document.getElementById('editId').value = '';
+  document.getElementById('medName').value = '';
+  document.getElementById('medCat').value = '';
+  document.getElementById('medStock').value = '';
+  document.getElementById('medPrice').value = '';
+  document.getElementById('medWholesale').value = '';
+  document.getElementById('medExpiry').value = '';
+}
+
+// Render Medicines with Pagination
+function renderMedicines() {
+  const totalPages = Math.ceil(medicines.length / itemsPerPage);
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const pageMeds = medicines.slice(start, end);
   
-  // Import Excel
-  function importExcel(input) {
-    let file = input.files[0];
-    if(!file) return;
-    let reader = new FileReader();
-    reader.onload = function(e) {
-      let data = new Uint8Array(e.target.result);
-      let workbook = XLSX.read(data, {type: 'array'});
-      let firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      let jsonData = XLSX.utils.sheet_to_json(firstSheet);
+  let html = '';
+  pageMeds.forEach(med => {
+    html += `
+      <tr>
+        <td>${med.name}</td>
+        <td>${med.category}</td>
+        <td>${med.stock}</td>
+        <td>PKR ${med.wholesale}</td>
+        <td>PKR ${med.price}</td>
+        <td>${med.expiry || '-'}</td>
+        <td class="action-btns">
+          <button class="btn btn-sm btn-info" onclick="editMedicine(${med.id})">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteMedicine(${med.id})">🗑️</button>
+        </td>
+      </tr>
+    `;
+  });
+  
+  document.getElementById('medTable').innerHTML = html || '<tr><td colspan="7" style="text-align:center;">No medicines found</td></tr>';
+  
+  // Render Pagination
+  let pagHtml = `
+    <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>⬅️ Previous</button>
+    <span class="page-info">Page ${currentPage} of ${totalPages || 1}</span>
+    <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages || medicines.length === 0 ? 'disabled' : ''}>Next ➡️</button>
+  `;
+  document.getElementById('pagination').innerHTML = pagHtml;
+}
+
+// Change Page
+function changePage(page) {
+  const totalPages = Math.ceil(medicines.length / itemsPerPage);
+  if(page < 1 || page > totalPages) return;  currentPage = page;
+  renderMedicines();
+}
+
+// Import Excel
+function importExcel(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, {type: 'array'});
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(firstSheet);
       
+      let imported = 0;
       jsonData.forEach(row => {
-        medicines.push({
-          id: Date.now() + Math.random(),
-          name: row.Name || row.name || '',
-          cat: row.Category || row.category || '',
-          stock: parseInt(row.Stock || row.stock) || 0,
-          price: parseFloat(row.Price || row.price) || 0,
-          wholesale: parseFloat(row.Wholesale || row.wholesale) || 0,
-          expiry: row.Expiry || row.expiry || ''
-        });
+        if(row.Name || row.name) {
+          medicines.push({
+            id: Date.now() + Math.random(),
+            name: row.Name || row.name || '',
+            category: row.Category || row.category || '',
+            stock: parseInt(row.Stock || row.stock) || 0,
+            price: parseFloat(row.Price || row.price) || 0,
+            wholesale: parseFloat(row.Wholesale || row.wholesale) || 0,
+            expiry: row.Expiry || row.expiry || ''
+          });
+          imported++;
+        }
       });
-      saveData(); renderAll();
-      alert('Medicines imported successfully!');
-    };    reader.readAsArrayBuffer(file);
-    input.value = '';
+      
+      localStorage.setItem('meds', JSON.stringify(medicines));
+      showImportAlert(`✅ Successfully imported ${imported} medicines!`, 'success');
+      renderMedicines();
+      updateDashboard();
+    } catch(err) {
+      showImportAlert('❌ Error importing file. Make sure it has columns: Name, Category, Stock, Price, Wholesale, Expiry', 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  event.target.value = '';
+}
+
+// Show Import Alert
+function showImportAlert(message, type) {
+  const alert = document.getElementById('importAlert');
+  alert.className = `alert alert-${type}`;
+  alert.textContent = message;  setTimeout(() => alert.textContent = '', 5000);
+}
+
+// Export CSV
+function exportCSV() {
+  const ws = XLSX.utils.json_to_sheet(medicines);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Medicines');
+  XLSX.writeFile(wb, 'KhanMedicos_Inventory.xlsx');
+}
+
+// Setup Search Dropdown for Billing
+function setupSearchDropdown() {
+  const searchInput = document.getElementById('medSearch');
+  const dropdown = document.getElementById('searchDropdown');
+  
+  searchInput.addEventListener('input', function() {
+    const query = this.value.toLowerCase().trim();
+    dropdown.innerHTML = '';
+    
+    if(query.length < 1) {
+      dropdown.style.display = 'none';
+      return;
+    }
+    
+    const filtered = medicines.filter(m => 
+      m.name.toLowerCase().includes(query) && m.stock > 0
+    );
+    
+    if(filtered.length === 0) {
+      dropdown.innerHTML = '<div class="dropdown-item"><small>No medicines found</small></div>';
+    } else {
+      filtered.forEach(med => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.innerHTML = `
+          <strong>${med.name}</strong>
+          <small>Stock: ${med.stock} | Price: PKR ${med.price}</small>
+        `;
+        item.onclick = () => selectMedicine(med);
+        dropdown.appendChild(item);
+      });
+    }
+    
+    dropdown.style.display = 'block';
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {      dropdown.style.display = 'none';
+    }
+  });
+}
+
+// Select Medicine from Dropdown
+function selectMedicine(med) {
+  document.getElementById('medSearch').value = med.name;
+  document.getElementById('searchDropdown').style.display = 'none';
+  addToCart(med);
+}
+
+// Add to Cart
+function addToCart(med) {
+  const existing = cart.find(item => item.id === med.id);
+  if(existing) {
+    if(existing.qty < med.stock) {
+      existing.qty++;
+      existing.total = existing.qty * existing.price;
+    } else {
+      alert('Not enough stock!');
+      return;
+    }
+  } else {
+    cart.push({
+      id: med.id,
+      name: med.name,
+      price: med.price,
+      qty: 1,
+      total: med.price
+    });
+    // Reduce stock temporarily
+    med.stock--;
+  }
+  renderCart();
+}
+
+// Render Cart
+function renderCart() {
+  let html = '';
+  let subtotal = 0;
+  
+  cart.forEach((item, index) => {
+    subtotal += item.total;
+    html += `
+      <tr>
+        <td>${item.name}</td>
+        <td><input type="number" value="${item.qty}" min="1" style="width:60px" onchange="updateQty(${index}, this.value)"></td>
+        <td>PKR ${item.price}</td>
+        <td>PKR ${item.total}</td>        <td><button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})">✖</button></td>
+      </tr>
+    `;
+  });
+  
+  document.getElementById('cartTable').innerHTML = html || '<tr><td colspan="5" style="text-align:center;">Cart is empty</td></tr>';
+  
+  const gst = subtotal * 0.05;
+  const total = subtotal + gst;
+  
+  document.getElementById('subTotal').textContent = subtotal.toFixed(2);
+  document.getElementById('gst').textContent = gst.toFixed(2);
+  document.getElementById('grandTotal').textContent = total.toFixed(2);
+}
+
+// Update Quantity
+function updateQty(index, qty) {
+  const item = cart[index];
+  const med = medicines.find(m => m.id === item.id);
+  if(qty > med.stock + item.qty) {
+    alert('Not enough stock! Available: ' + med.stock);
+    renderCart();
+    return;
+  }
+  item.qty = parseInt(qty);
+  item.total = item.qty * item.price;
+  renderCart();
+}
+
+// Remove from Cart
+function removeFromCart(index) {
+  const item = cart[index];
+  const med = medicines.find(m => m.id === item.id);
+  if(med) med.stock += item.qty;
+  cart.splice(index, 1);
+  renderCart();
+}
+
+// Generate Bill
+function generateBill() {
+  if(cart.length === 0) {
+    alert('Cart is empty!');
+    return;
   }
   
-  // Export CSV
-  function exportInventory() {
-    let ws = XLSX.utils.json_to_sheet(medicines);
-    let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Inventory");
-    XLSX.writeFile(wb, "KhanMedicos_Inventory.xlsx");
-  }
+  const customer = {
+    name: document.getElementById('custName').value || 'Walk-in Customer',
+    phone: document.getElementById('custPhone').value || 'N/A'
+  };
+    const total = parseFloat(document.getElementById('grandTotal').textContent);
+  
+  // Save sale
+  sales.push({
+    date: new Date().toLocaleDateString(),
+    customer: customer.name,
+    items: [...cart],
+    total: total
+  });
+  localStorage.setItem('sales', JSON.stringify(sales));
+  
+  // Show bill modal
+  document.getElementById('billCust').textContent = customer.name;
+  document.getElementById('billPhone').textContent = customer.phone;
+  document.getElementById('billDate').textContent = new Date().toLocaleString();
+  
+  let html = '';
+  cart.forEach(item => {
+    html += `<tr><td>${item.name}</td><td>${item.qty}</td><td>PKR ${item.price}</td><td>PKR ${item.total}</td></tr>`;
+  });
+  document.getElementById('billItems').innerHTML = html;
+  document.getElementById('billTotal').textContent = total.toFixed(2);
+  
+  document.getElementById('billModal').style.display = 'flex';
+  
+  // Save medicines with updated stock
+  localStorage.setItem('meds', JSON.stringify(medicines));
+  
+  // Reset
+  cart = [];
+  renderCart();
+  document.getElementById('custName').value = '';
+  document.getElementById('custPhone').value = '';
+  document.getElementById('medSearch').value = '';
+  updateDashboard();
+}
 
-  // === EXPENSES ===
-  function addExpense() {
-    let e = {
-      id: Date.now(),
-      title: document.getElementById('expTitle').value,
-      amount: parseFloat(document.getElementById('expAmount').value) || 0,
-      date: document.getElementById('expDate').value || new Date().toISOString().split('T')[0],
-      note: document.getElementById('expNote').value
-    };
-    if(!e.title || !e.amount) return alert('Title & Amount required');
-    expenses.push(e);
-    saveData(); renderAll(); clearExpForm();
-  }
-  function clearExpForm() { ['expTitle','expAmount','expDate','expNote'].forEach(id=>document.getElementById(id).value=''); }
-  function renderExpenses() {
-    let html = '', total = 0;
-    expenses.forEach(e => {
-      total += e.amount;
-      html += `<tr><td>${e.date}</td><td>${e.title}</td><td>PKR ${e.amount}</td><td>${e.note}</td><td><button class="btn btn-sm btn-danger" onclick="deleteExp(${e.id})">🗑️</button></td></tr>`;
-    });
-    document.getElementById('expTable').innerHTML = html;
-    document.getElementById('totalExp').textContent = `PKR ${total}`;
-  }
-  function deleteExp(id) { expenses = expenses.filter(e=>e.id!==id); saveData(); renderAll(); }
+// Close Modal
+function closeModal() {
+  document.getElementById('billModal').style.display = 'none';
+}
 
-  // === ALERTS & EXPORT ===
-  function renderAlerts() {
-    let low = medicines.filter(m => m.stock < 10);
-    let html = low.length ? low.map(m => `<tr><td>${m.name}</td><td style="color:red;font-weight:bold;">${m.stock}</td><td>PKR ${m.price}</td><td>${m.cat}</td></tr>`).join('') : '<tr><td colspan="4">✅ All stock is above 10 units.</td></tr>';
-    document.getElementById('alertTable').innerHTML = html;
-  }
-  function exportLowStock() {
-    let low = medicines.filter(m => m.stock < 10);
-    let ws = XLSX.utils.json_to_sheet(low.map(m=>({Name:m.name, Category:m.cat, Current_Stock:m.stock, Price:m.price, Wholesale:m.wholesale})));
-    let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "LowStock_Reorder");
-    XLSX.writeFile(wb, "KhanMedicos_LowStock.xlsx");
-  }
-  // === BILLING & CUSTOMER LOOKUP ===
-  function setupSearch() {
-    const input = document.getElementById('medSearch');
-    const drop = document.getElementById('medDropdown');
-    input.addEventListener('input', () => {
-      let val = input.value.toLowerCase();
-      let filtered = medicines.filter(m => m.name.toLowerCase().includes(val) && m.stock > 0);
-      drop.innerHTML = filtered.map(m => `<div class="dropdown-item" onclick="selectMed('${m.name}', ${m.price})">${m.name} (PKR ${m.price}) - Stock: ${m.stock}</div>`).join('');
-      drop.style.display = filtered.length ? 'block' : 'none';
-    });
-    document.getElementById('custPhone').addEventListener('input', lookupCustomer);
-  }
-  function selectMed(name, price) {
-    document.getElementById('medSearch').value = name;
-    document.getElementById('medDropdown').style.display = 'none';
-    addToCartByName(name);
-  }
-  function addToCartByName(name) {
-    let med = medicines.find(m => m.name === name);
-    if(!med) return alert('Medicine not found');
-    if(med.stock <= 0) return alert('Out of stock!');
-    cart.push({name: med.name, price: med.price, qty: 1, total: med.price});
-    med.stock--;
-    saveData(); renderAll(); renderCart();
-    document.getElementById('medSearch').value = '';
-  }
-  function addToCart() {
-    let name = document.getElementById('medSearch').value;
-    if(!name) return alert('Select a medicine first');
-    addToCartByName(name);
-  }
-  function renderCart() {
-    let html = '', sub = 0;
-    cart.forEach((c,i) => {
-      let t = c.qty * c.price;
-      sub += t;
-      html += `<tr><td>${c.name}</td><td><input type="number" value="${c.qty}" min="1" style="width:60px" onchange="updateCartQty(${i}, this.value)"></td><td>PKR ${c.price}</td><td>PKR ${t}</td><td><button class="btn btn-sm btn-danger" onclick="removeFromCart(${i})">✖</button></td></tr>`;
-    });
-    document.getElementById('cartBody').innerHTML = html;
-    document.getElementById('cartSub').textContent = `PKR ${sub}`;
-    document.getElementById('cartGST').textContent = `PKR ${(sub*0.05).toFixed(2)}`;
-    document.getElementById('cartTotal').textContent = `PKR ${(sub*1.05).toFixed(2)}`;
-  }
-  function updateCartQty(i, val) { cart[i].qty = parseInt(val); renderCart(); }
-  function removeFromCart(i) { cart.splice(i,1); renderCart(); }
-
-  // === GENERATE BILL & EXPORT ===
-  function generateBill() {
-    if(cart.length === 0) return alert('Cart is empty');    let phone = document.getElementById('custPhone').value || 'Walk-in';
-    let name = document.getElementById('custName').value || 'Customer';
-    
-    // Save/Update Customer
-    let existing = customers.find(c => c.phone === phone);
-    if(existing) { existing.name = name; existing.lastVisit = new Date().toISOString(); }
-    else { customers.push({phone, name, lastVisit: new Date().toISOString()}); }
-    saveData();
-
-    // Populate Modal
-    document.getElementById('billCust').textContent = name;
-    document.getElementById('billPhone').textContent = phone;
-    document.getElementById('billDate').textContent = new Date().toLocaleString();
-    let html = '';
-    let sub = 0;
-    cart.forEach(c => {
-      let t = c.qty * c.price; sub += t;
-      html += `<tr><td>${c.name}</td><td>${c.qty}</td><td>PKR ${c.price}</td><td>PKR ${t}</td></tr>`;
-    });
-    document.getElementById('billBody').innerHTML = html;
-    document.getElementById('billTotal').textContent = `PKR ${(sub*1.05).toFixed(2)}`;
-    document.getElementById('billModal').style.display = 'flex';
-    cart = []; renderCart();
-  }
-  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-  function downloadPDF() {
-    const { jsPDF } = window.jspdf;
-    html2canvas(document.getElementById('billContent')).then(canvas => {
-      let imgData = canvas.toDataURL('image/png');
-      let pdf = new jsPDF('p', 'mm', 'a4');
-      let imgProps = pdf.getImageProperties(imgData);
-      let pdfWidth = pdf.internal.pageSize.getWidth();
-      let pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Bill_${Date.now()}.pdf`);
+// Render Alerts
+function renderAlerts() {
+  const lowStock = medicines.filter(m => m.stock < 10);
+  let html = '<h3>Low Stock Medicines</h3><table><tr><th>Name</th><th>Stock</th><th>Price</th></tr>';
+  
+  if(lowStock.length === 0) {
+    html += '<tr><td colspan="3" style="text-align:center;">✅ All medicines have sufficient stock</td></tr>';
+  } else {    lowStock.forEach(m => {
+      html += `<tr><td>${m.name}</td><td style="color:red;font-weight:bold;">${m.stock}</td><td>PKR ${m.price}</td></tr>`;
     });
   }
-  function sendWhatsApp() {
-    let phone = document.getElementById('custPhone').value;
-    let name = document.getElementById('billCust').textContent;
-    let total = document.getElementById('billTotal').textContent;
-    let msg = `💊 *Khan Medicos Bill*\n👤 ${name}\n📞 ${phone}\n💰 Total: ${total}\n📅 ${new Date().toLocaleDateString()}\n\nAapki sehat hamari zimmedari hai.`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-  }
-
-  // === ADMIN ===
-  function addAdmin() {
-    let u = document.getElementById('adminUser').value;
-    let p = document.getElementById('adminPass').value;
-    let r = document.getElementById('adminRole').value;    if(!u || !p) return alert('Username & Password required');
-    admins.push({user:u, pass:p, role:r});
-    saveData(); renderAdmins();
-    document.getElementById('adminUser').value = ''; document.getElementById('adminPass').value = '';
-  }
-  function renderAdmins() {
-    let html = admins.map((a,i) => `<tr><td>${a.user}</td><td><span class="role-badge role-${a.role}">${a.role.toUpperCase()}</span></td><td><button class="btn btn-sm btn-danger" onclick="deleteAdmin(${i})">Remove</button></td></tr>`).join('');
-    document.getElementById('adminTable').innerHTML = html;
-  }
-  function deleteAdmin(i) { admins.splice(i,1); saveData(); renderAdmins(); }
-
-  // === UTILS ===
-  function saveData() {
-    localStorage.setItem('km_meds', JSON.stringify(medicines));
-    localStorage.setItem('km_custs', JSON.stringify(customers));
-    localStorage.setItem('km_exp', JSON.stringify(expenses));
-    localStorage.setItem('km_admins', JSON.stringify(admins));
-  }
+  html += '</table>';
+  document.getElementById('alertList').innerHTML = html;
+}
 </script>
+
 </body>
 </html>
