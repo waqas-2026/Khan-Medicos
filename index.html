@@ -149,7 +149,7 @@
                 <div class="card">
                     <div class="card-header">Quick Actions</div>
                     <button class="btn btn-success" onclick="showPage('inventory')">+ Add Medicine</button>
-                    <button class="btn btn-primary" onclick="showPage('billing')">🧾 New Bill</button>
+                    <button class="btn btn-primary" onclick="showPage('billing')"> New Bill</button>
                 </div>
             </div>
 
@@ -190,7 +190,7 @@
                     <button class="btn btn-success" onclick="saveMedicine()">💾 Save Medicine</button>
                     <button class="btn btn-info" onclick="document.getElementById('excelFile').click()">📥 Import Excel</button>
                     <input type="file" id="excelFile" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
-                    <button class="btn btn-primary" onclick="exportExcel()">📄 Export Excel</button>
+                    <button class="btn btn-primary" onclick="exportExcel()"> Export Excel</button>
                     <button class="btn btn-warning hidden" id="cancelBtn" onclick="cancelEdit()">❌ Cancel</button>
                 </div>
 
@@ -259,7 +259,7 @@
 
             <!-- Alerts -->
             <div id="alerts" class="page">
-                <h1 style="margin-bottom: 20px;">⚠️ Low Stock & Expiring Soon</h1>
+                <h1 style="margin-bottom: 20px;">️ Low Stock & Expiring Soon</h1>
                 <div class="card" id="alertsContent"></div>
             </div>
 
@@ -329,19 +329,32 @@
 
     <script>
         // Initialize Data
-        let medicines = JSON.parse(localStorage.getItem('khan_medicines')) || [
-            {id: 1, name: 'Panadol', category: 'Pain Relief', stock: 50, price: 50, wholesale: 35, expiry: '2025-12-01'},
-            {id: 2, name: 'Augmentin', category: 'Antibiotic', stock: 30, price: 120, wholesale: 85, expiry: '2025-10-15'},
-            {id: 3, name: 'Brufen', category: 'Pain Relief', stock: 40, price: 80, wholesale: 55, expiry: '2026-03-20'}
-        ];
-        let cart = [];
+        let medicines = JSON.parse(localStorage.getItem('khan_medicines'));
         let expenses = JSON.parse(localStorage.getItem('khan_expenses')) || [];
         let customers = JSON.parse(localStorage.getItem('khan_customers')) || [];
         let sales = JSON.parse(localStorage.getItem('khan_sales')) || [];
+        let cart = [];
         let currentPage = 1;
         const itemsPerPage = 20;
 
-        // Initialize        document.addEventListener('DOMContentLoaded', function() {
+        // Sample data initialization
+        if (!medicines || medicines.length === 0) {
+            medicines = [
+                {id: 1, name: 'Panadol', category: 'Pain Relief', stock: 50, price: 50, wholesale: 35, expiry: '2025-12-01'},
+                {id: 2, name: 'Augmentin', category: 'Antibiotic', stock: 30, price: 120, wholesale: 85, expiry: '2025-10-15'},                {id: 3, name: 'Brufen', category: 'Pain Relief', stock: 40, price: 80, wholesale: 55, expiry: '2026-03-20'},
+                {id: 4, name: 'Ciprofloxacin', category: 'Antibiotic', stock: 25, price: 150, wholesale: 110, expiry: '2026-01-30'},
+                {id: 5, name: 'Paracetamol', category: 'Pain Relief', stock: 60, price: 30, wholesale: 20, expiry: '2026-05-15'},
+                {id: 6, name: 'Amoxicillin', category: 'Antibiotic', stock: 35, price: 90, wholesale: 65, expiry: '2025-11-20'},
+                {id: 7, name: 'Vitamin C', category: 'Vitamins', stock: 80, price: 40, wholesale: 25, expiry: '2026-08-10'},
+                {id: 8, name: 'Insulin', category: 'Diabetes', stock: 15, price: 500, wholesale: 380, expiry: '2025-09-30'},
+                {id: 9, name: 'Metformin', category: 'Diabetes', stock: 45, price: 70, wholesale: 50, expiry: '2026-04-25'},
+                {id: 10, name: 'Losartan', category: 'Blood Pressure', stock: 20, price: 100, wholesale: 75, expiry: '2026-02-18'}
+            ];
+            localStorage.setItem('khan_medicines', JSON.stringify(medicines));
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
             renderMedicines();
             updateDashboard();
             setupSearch();
@@ -377,8 +390,7 @@
             document.getElementById('outOfStock').textContent = medicines.filter(m => m.stock === 0).length;
             
             const today = new Date().toLocaleDateString();
-            const todaySales = sales.filter(s => s.date === today).reduce((sum, s) => sum + s.total, 0);
-            document.getElementById('todaySale').textContent = 'PKR ' + todaySales.toLocaleString();
+            const todaySales = sales.filter(s => s.date === today).reduce((sum, s) => sum + s.total, 0);            document.getElementById('todaySale').textContent = 'PKR ' + todaySales.toLocaleString();
         }
 
         // Save Medicine
@@ -390,6 +402,7 @@
             const price = parseFloat(document.getElementById('medPrice').value) || 0;
             const wholesale = parseFloat(document.getElementById('medWholesale').value) || 0;
             const expiry = document.getElementById('medExpiry').value;
+
             if(!name || !price) {
                 showAlert('Name and Price are required!', 'error');
                 return;
@@ -426,8 +439,7 @@
             document.getElementById('medStock').value = med.stock;
             document.getElementById('medPrice').value = med.price;
             document.getElementById('medWholesale').value = med.wholesale;
-            document.getElementById('medExpiry').value = med.expiry;
-            document.getElementById('cancelBtn').classList.remove('hidden');
+            document.getElementById('medExpiry').value = med.expiry;            document.getElementById('cancelBtn').classList.remove('hidden');
             window.scrollTo(0, 0);
         }
 
@@ -439,7 +451,8 @@
                 renderMedicines();
                 updateDashboard();
                 showAlert('Medicine deleted successfully!', 'success');
-            }        }
+            }
+        }
 
         // Cancel Edit
         function cancelEdit() {
@@ -475,8 +488,7 @@
                     <tr>
                         <td>${med.name}</td>
                         <td>${med.category}</td>
-                        <td>${med.stock}</td>
-                        <td>PKR ${med.wholesale}</td>
+                        <td>${med.stock}</td>                        <td>PKR ${med.wholesale}</td>
                         <td>PKR ${med.price}</td>
                         <td>${med.expiry || '-'}</td>
                         <td>${status}</td>
@@ -488,7 +500,8 @@
                 `;
             });
 
-            if(pageMeds.length === 0) {                html = '<tr><td colspan="8" style="text-align: center; padding: 40px;">No medicines found. Add your first medicine!</td></tr>';
+            if(pageMeds.length === 0) {
+                html = '<tr><td colspan="8" style="text-align: center; padding: 40px;">No medicines found. Add your first medicine!</td></tr>';
             }
 
             document.getElementById('medTable').innerHTML = html;
@@ -525,7 +538,6 @@
                     dropdown.style.display = 'none';
                     return;
                 }
-
                 const filtered = medicines.filter(m => 
                     m.name.toLowerCase().includes(query) && m.stock > 0
                 );
@@ -537,7 +549,8 @@
                         const item = document.createElement('div');
                         item.className = 'dropdown-item';
                         item.innerHTML = `
-                            <strong>${med.name}</strong>                            <small>Stock: ${med.stock} | Price: PKR ${med.price} | ${med.category}</small>
+                            <strong>${med.name}</strong>
+                            <small>Stock: ${med.stock} | Price: PKR ${med.price} | ${med.category}</small>
                         `;
                         item.onclick = () => selectMedicine(med);
                         dropdown.appendChild(item);
@@ -573,8 +586,7 @@
                     showAlert('Not enough stock available!', 'error');
                     return;
                 }
-            } else {
-                cart.push({
+            } else {                cart.push({
                     id: med.id,
                     name: med.name,
                     price: med.price,
@@ -586,7 +598,8 @@
             renderCart();
         }
 
-        // Render Cart        function renderCart() {
+        // Render Cart
+        function renderCart() {
             let html = '';
             let subtotal = 0;
 
@@ -623,7 +636,6 @@
             const item = cart[index];
             const med = medicines.find(m => m.id === item.id);
             const newQty = parseInt(qty);
-
             if(newQty > med.stock) {
                 showAlert(`Only ${med.stock} items available in stock!`, 'error');
                 renderCart();
@@ -635,7 +647,8 @@
             renderCart();
         }
 
-        // Remove from Cart        function removeFromCart(index) {
+        // Remove from Cart
+        function removeFromCart(index) {
             cart.splice(index, 1);
             renderCart();
         }
@@ -671,8 +684,7 @@
                 phone: custPhone,
                 items: [...cart],
                 total: total,
-                timestamp: new Date().toISOString()
-            });
+                timestamp: new Date().toISOString()            });
 
             // Update stock
             cart.forEach(item => {
@@ -684,7 +696,8 @@
 
             // Show bill modal
             document.getElementById('billCustomer').textContent = custName;
-            document.getElementById('billPhone').textContent = custPhone;            document.getElementById('billDate').textContent = new Date().toLocaleString();
+            document.getElementById('billPhone').textContent = custPhone;
+            document.getElementById('billDate').textContent = new Date().toLocaleString();
 
             let html = '';
             cart.forEach(item => {
@@ -720,8 +733,7 @@
                 html += '<div class="alert alert-success">✅ All medicines have sufficient stock!</div>';
             } else {
                 if(outOfStock.length > 0) {
-                    html += '<h4 style="color: #ef4444; margin: 20px 0 10px;">🚫 Out of Stock:</h4><table><tr><th>Name</th><th>Category</th><th>Price</th></tr>';
-                    outOfStock.forEach(m => {
+                    html += '<h4 style="color: #ef4444; margin: 20px 0 10px;">🚫 Out of Stock:</h4><table><tr><th>Name</th><th>Category</th><th>Price</th></tr>';                    outOfStock.forEach(m => {
                         html += `<tr><td>${m.name}</td><td>${m.category}</td><td>PKR ${m.price}</td></tr>`;
                     });
                     html += '</table>';
@@ -733,7 +745,8 @@
                         html += `<tr><td>${m.name}</td><td>${m.category}</td><td style="color: #ef4444; font-weight: bold;">${m.stock}</td><td>PKR ${m.price}</td></tr>`;
                     });
                     html += '</table>';
-                }            }
+                }
+            }
 
             document.getElementById('alertsContent').innerHTML = html;
         }
@@ -769,8 +782,7 @@
 
                     saveData();
                     showAlert(`✅ Successfully imported ${imported} medicines!`, 'success');
-                    renderMedicines();
-                    updateDashboard();
+                    renderMedicines();                    updateDashboard();
                 } catch(err) {
                     showAlert('❌ Error importing file. Make sure Excel has columns: Name, Category, Stock, Price, Wholesale, Expiry', 'error');
                 }
@@ -782,7 +794,8 @@
         // Export Excel
         function exportExcel() {
             const ws = XLSX.utils.json_to_sheet(medicines);
-            const wb = XLSX.utils.book_new();            XLSX.utils.book_append_sheet(wb, ws, 'Medicines');
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Medicines');
             XLSX.writeFile(wb, 'KhanMedicos_Inventory.xlsx');
             showAlert('Excel file downloaded!', 'success');
         }
@@ -819,7 +832,6 @@
             let total = 0;
 
             expenses.sort((a, b) => new Date(b.date) - new Date(a.date));
-
             expenses.forEach(exp => {
                 total += exp.amount;
                 html += `
@@ -832,6 +844,7 @@
                     </tr>
                 `;
             });
+
             if(expenses.length === 0) {
                 html = '<tr><td colspan="5" style="text-align: center; padding: 30px;">No expenses recorded yet.</td></tr>';
             }
